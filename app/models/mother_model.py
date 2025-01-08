@@ -5,12 +5,16 @@ from datetime import datetime
 
 class Mother(db.Model):
 	__tablename__ = "mothers"
-
+	
 	id = db.Column(db.String(10), primary_key=True, default=lambda: str(uuid.uuid4()))
 	hospital_id = db.Column(db.String(10), db.ForeignKey('hospitals.id'), nullable=False)
-	home_address = db.Column(db.String(100), nullable=False)
-	phone_number = db.Column(db.Integer, nullable=False)
-	email = db.Column(db.String(20), nullable=False)
+	first_name = db.Column(db.String(100), nullable=False)
+	last_name = db.Column(db.Integer, nullable=False)
+	age = db.Column(db.Integer, nullable=False)
+	genotype = db.Column(db.String(10), nullable=False)
+	blood_group = db.Column(db.String(10), nullable=False)
+	nationality = db.Column(db.String(100), nullable=False)
+	email = db.Column(db.String(100), nullable=False, unique=True)
 	password = db.Column(db.String(150), nullable=False)
 	created_at = db.Column(db.DateTime, default=datetime.utcnow)
 

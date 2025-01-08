@@ -1,153 +1,100 @@
-from flask import request, Blueprint, jsonify
-from app.models.antenatal_model import AntenatalRecord  # Corrected the model import to AntenatalRecord
-from app.models.mother_model import Mother
+from flask import Blueprint, jsonify, request
 from app import db
-from app.utils.auth import decode_token  # Ensure the correct path for imports
+from app.models.mother_model import Mother
+from app.models.antenatal_model import AntenatalRecord  # Assuming the model is defined here
+import uuid
+from datetime import datetime
 
-# Blueprint for antenatal-related routes
 antenatal_bp = Blueprint('antenatal_bp', __name__)
 
-# Helper function for user authentication
-def authenticate_user():
-    auth_header = request.headers.get('Authorization')
-
-    if not auth_header or not auth_header.startswith('Bearer '):
-        return None, "Authorization token not found", 401
-
-    token = auth_header.split(" ")[1]
-    user_id = decode_token(token)
-    if not user_id:
-        return None, "Invalid token", 401
-
-    user = Mother.query.get(user_id)
-    if not user:
-        return None, "User not found", 401
-
-    return user, None, 200
-
-# Endpoint to register a new antenatal visit
-@antenatal_bp.route('/register_antenatal_visit', methods=['POST'])
-def create_antenatal():
-    user, message, status_code = authenticate_user()
-    if not user:
-        return jsonify({"message": message}), status_code
-
+# Create Antenatal Record
+@antenatal_bp.route('/create_antenatal_record', methods=['POST'])
+def create_antenatal_record():
     data = request.get_json()
 
+    # Extract fields from request
+    mother_id = data.get('mother_id')
     weight = data.get('weight')
     blood_pressure = data.get('blood_pressure')
     tests = data.get('tests')
-    date = data.get('date')  # Ensure valid date format is passed
     remark = data.get('remark')
 
     # Validate required fields
-    if not weight:
-        return jsonify({"error": "Weight is required!"}), 400
-    if not blood_pressure:
-        return jsonify({"error": "Blood pressure is required!"}), 400
-    if not date:
-        return jsonify({"error": "Date is required!"}), 400
+    if not all([mother_id, weight, blood_pressure]):
+        return jsonify({"error": "mother_id, weight, and blood_pressure are required"}), 400
 
-    # Create and save a new antenatal record
-    new_record = AntenatalRecord(  # Use AntenatalRecord instead of Antenatal
-        mother_id=user.id,
-        date=date,
+    # Check if the mother exists
+    mother = Mother.query.get(mother_id)
+    if not mother:
+        return jsonify({"error": "Mother not found"}), 404
+
+    # Create and save the antenatal record
+    antenatal_record = AntenatalRecord(
+        mother_id=mother_id,
         weight=weight,
         blood_pressure=blood_pressure,
         tests=tests,
         remark=remark
     )
-    db.session.add(new_record)
+
+    db.session.add(antenatal_record)
     db.session.commit()
 
-    return jsonify({"message": "Antenatal record created successfully!"}), 201
+    return jsonify({"message": "Antenatal record created successfully", "record": antenatal_record.id}), 201
 
-# Endpoint to retrieve all antenatal records for the authenticated user
-@antenatal_bp.route('/antenatal_records', methods=['GET'])
-def get_all_antenatal_records():
-    user, message, status_code = authenticate_user()
-    if not user:
-        return jsonify({"message": message}), status_code
+# Retrieve Antenatal Records by Mother ID
+@antenatal_bp.route('/get_antenatal_records/<string:mother_id>', methods=['GET'])
+def get_antenatal_records(mother_id):
+    # Check if the mother exists
+    mother = Mother.query.get(mother_id)
+    if not mother:
+        return jsonify({"error": "Mother not found"}), 404
 
-    records = AntenatalRecord.query.filter_by(mother_id=user.id).all()  # Corrected to AntenatalRecord
-    response = [
+    # Fetch antenatal records for the mother
+    records = AntenatalRecord.query.filter_by(mother_id=mother_id).all()
+    records_list = [
         {
             "id": record.id,
-            "date": record.date.strftime('%Y-%m-%d'),
             "weight": record.weight,
             "blood_pressure": record.blood_pressure,
             "tests": record.tests,
             "remark": record.remark,
+            "date_created": record.date_created
         }
         for record in records
     ]
 
-    return jsonify(response), 200
+    return jsonify({"records": records_list}), 200
 
-# Endpoint to retrieve a specific antenatal record
-@antenatal_bp.route('/antenatal_record/<string:id>', methods=['GET'])
-def get_antenatal_record(id):
-    user, message, status_code = authenticate_user()
-    if not user:
-        return jsonify({"message": message}), status_code
-
-    record = AntenatalRecord.query.get(id)  # Corrected to AntenatalRecord
-    if not record:
-        return jsonify({"error": "Record not found!"}), 404
-
-    if record.mother_id != user.id:
-        return jsonify({"message": "Unauthorized"}), 403
-
-    response = {
-        "id": record.id,
-        "date": record.date.strftime('%Y-%m-%d'),
-        "weight": record.weight,
-        "blood_pressure": record.blood_pressure,
-        "tests": record.tests,
-        "remark": record.remark,
-    }
-
-    return jsonify(response), 200
-
-# Endpoint to update an existing antenatal record
-@antenatal_bp.route('/update_antenatal/<string:id>', methods=['PUT'])
-def update_antenatal_record(id):
-    user, message, status_code = authenticate_user()
-    if not user:
-        return jsonify({"message": message}), status_code
-
-    record = AntenatalRecord.query.get(id)  # Corrected to AntenatalRecord
-    if not record:
-        return jsonify({"error": "Record not found!"}), 404
-
-    if record.mother_id != user.id:
-        return jsonify({"message": "Unauthorized"}), 403
-
+# Update Antenatal Record
+@antenatal_bp.route('/update_antenatal_record/<string:record_id>', methods=['PUT'])
+def update_antenatal_record(record_id):
     data = request.get_json()
 
-    record.date = data.get('date', record.date)
+    # Find the antenatal record by ID
+    record = AntenatalRecord.query.get(record_id)
+    if not record:
+        return jsonify({"error": "Antenatal record not found"}), 404
+
+    # Update fields if provided
     record.weight = data.get('weight', record.weight)
     record.blood_pressure = data.get('blood_pressure', record.blood_pressure)
     record.tests = data.get('tests', record.tests)
     record.remark = data.get('remark', record.remark)
 
+    # Commit the changes to the database
     db.session.commit()
-    return jsonify({"message": "Antenatal record updated successfully!"}), 200
+    return jsonify({"message": "Antenatal record updated successfully"}), 200
 
-# Endpoint to delete an antenatal record
-@antenatal_bp.route('/delete_antenatal/<string:id>', methods=['DELETE'])
-def delete_antenatal_record(id):
-    user, message, status_code = authenticate_user()
-    if not user:
-        return jsonify({"message": message}), status_code
-
-    record = AntenatalRecord.query.get(id)  # Corrected to AntenatalRecord
+# Delete Antenatal Record
+@antenatal_bp.route('/delete_antenatal_record/<string:record_id>', methods=['DELETE'])
+def delete_antenatal_record(record_id):
+    # Find the antenatal record by ID
+    record = AntenatalRecord.query.get(record_id)
     if not record:
-        return jsonify({"error": "Record not found!"}), 404
+        return jsonify({"error": "Antenatal record not found"}), 404
 
-    if record.mother_id != user.id:
-        return jsonify({"message": "Unauthorized"}), 403
-
+    # Delete the record
     db.session.delete(record)
     db.session.commit()
-    return jsonify({"message": "Antenatal record deleted successfully!"}), 200
+    return jsonify({"message": "Antenatal record deleted successfully"}), 200

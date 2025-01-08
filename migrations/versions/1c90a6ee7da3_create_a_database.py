@@ -1,8 +1,8 @@
-"""create database
+"""create a database
 
-Revision ID: cb8e036e4f78
+Revision ID: 1c90a6ee7da3
 Revises: 
-Create Date: 2025-01-08 13:45:42.196692
+Create Date: 2025-01-08 18:24:30.324606
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'cb8e036e4f78'
+revision = '1c90a6ee7da3'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -31,13 +31,18 @@ def upgrade():
     op.create_table('mothers',
     sa.Column('id', sa.String(length=10), nullable=False),
     sa.Column('hospital_id', sa.String(length=10), nullable=False),
-    sa.Column('home_address', sa.String(length=100), nullable=False),
-    sa.Column('phone_number', sa.Integer(), nullable=False),
-    sa.Column('email', sa.String(length=20), nullable=False),
+    sa.Column('first_name', sa.String(length=100), nullable=False),
+    sa.Column('last_name', sa.Integer(), nullable=False),
+    sa.Column('age', sa.Integer(), nullable=False),
+    sa.Column('genotype', sa.String(length=10), nullable=False),
+    sa.Column('blood_group', sa.String(length=10), nullable=False),
+    sa.Column('nationality', sa.String(length=100), nullable=False),
+    sa.Column('email', sa.String(length=100), nullable=False),
     sa.Column('password', sa.String(length=150), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['hospital_id'], ['hospitals.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
     )
     op.create_table('antenatal_records',
     sa.Column('id', sa.String(length=36), nullable=False),

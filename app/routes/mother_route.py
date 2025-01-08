@@ -1,8 +1,10 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.models.mother_model import Mother
-from app import db
 from flask_jwt_extended import create_access_token
+from app import db
+from app.models.mother_model import Mother
+
+
 
 mother_bp = Blueprint('mother_bp', __name__)
 
@@ -11,60 +13,106 @@ mother_bp = Blueprint('mother_bp', __name__)
 def register_mother():
     data = request.get_json()
 
-    # Extract data from request
+    # Extract fields from request data
     first_name = data.get('first_name')
     last_name = data.get('last_name')
     age = data.get('age')
-    blood_group = data.get('blood_group')
     genotype = data.get('genotype')
+    blood_group = data.get('blood_group')
     nationality = data.get('nationality')
     email = data.get('email')
     password = data.get('password')
+    hospital_id = data.get('hospital_id')
 
     # Validate required fields
-    if any(not field for field in [first_name, last_name, age, blood_group, genotype, nationality, email, password]):
-        return jsonify({"error": "All fields are required!"}), 400
+    if any(not field for field in [first_name, last_name, age, genotype, blood_group, nationality, email, password, hospital_id]):
+        return jsonify({"error": "All fields are required"}), 400
 
-    # Check if the email already exists
+    # Check if email already exists
     if Mother.query.filter_by(email=email).first():
-        return jsonify({"error": "Email already exists!"}), 400
+        return jsonify({"error": "Email already exists"}), 400
 
-    # Hash the password and create new mother record
+    # Hash the password
     password_hash = generate_password_hash(password)
+
+    # Save the new mother to the database
     new_mother = Mother(
         first_name=first_name,
         last_name=last_name,
         age=age,
-        blood_group=blood_group,
         genotype=genotype,
+        blood_group=blood_group,
         nationality=nationality,
         email=email,
-        password=password_hash
+        password=password_hash,
+        hospital_id=hospital_id
     )
-
     db.session.add(new_mother)
     db.session.commit()
 
-    return jsonify({"message": "Mother registered successfully!"}), 201
+    return jsonify({"message": "Mother registered successfully"}), 201
+
 
 # Mother Login
 @mother_bp.route('/login_mother', methods=['POST'])
-def mother_login():
+def login_mother():
     data = request.get_json()
 
-    # Extract data from request
+    # Extract fields from request data
     email = data.get('email')
     password = data.get('password')
 
-    # Validate required fields
-    if not all([email, password]):
+    # Validate email and password
+    if not email or not password:
         return jsonify({"error": "Email and password are required"}), 400
 
-    # Check if the mother exists and validate password
+    # Check if the mother exists using email
     mother = Mother.query.filter_by(email=email).first()
-    if not mother or not check_password_hash(mother.password_hash, password):
+    if not mother or not check_password_hash(mother.password, password):
         return jsonify({"error": "Invalid email or password"}), 400
 
     # Generate JWT token
     token = create_access_token(identity=mother.id)
-    return jsonify({"message": "Login successful", "token": token}), 200
+    return jsonify({"token": token}), 200
+
+
+# Update Mother
+@mother_bp.route('/update_mother/<string:mother_id>', methods=['PUT'])
+def update_mother(mother_id):
+    data = request.get_json()
+
+    # Find the mother by ID
+    mother = Mother.query.get(mother_id)
+    if not mother:
+        return jsonify({"error": "Mother not found"}), 404
+
+    # Update fields if provided
+    mother.first_name = data.get('first_name', mother.first_name)
+    mother.last_name = data.get('last_name', mother.last_name)
+    mother.age = data.get('age', mother.age)
+    mother.genotype = data.get('genotype', mother.genotype)
+    mother.blood_group = data.get('blood_group', mother.blood_group)
+    mother.nationality = data.get('nationality', mother.nationality)
+    mother.email = data.get('email', mother.email)
+
+    # If password is provided, hash and update it
+    password = data.get('password')
+    if password:
+        mother.password = generate_password_hash(password)
+
+    db.session.commit()
+    return jsonify({"message": "Mother details updated successfully"}), 200
+
+
+# Delete Mother
+@mother_bp.route('/delete_mother/<string:mother_id>', methods=['DELETE'])
+def delete_mother(mother_id):
+    # Find the mother by ID
+    mother = Mother.query.get(mother_id)
+    if not mother:
+        return jsonify({"error": "Mother not found"}), 404
+
+    # Delete the mother record
+    db.session.delete(mother)
+    db.session.commit()
+    return jsonify({"message": "Mother deleted successfully"}), 200
