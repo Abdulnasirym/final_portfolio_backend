@@ -2,6 +2,7 @@ from app import db
 import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+#from app.models.antenatal_model import AntenatalRecord
 
 class Mother(db.Model):
 	__tablename__ = "mothers"
@@ -9,7 +10,7 @@ class Mother(db.Model):
 	id = db.Column(db.String(10), primary_key=True, default=lambda: str(uuid.uuid4()))
 	hospital_id = db.Column(db.String(10), db.ForeignKey('hospitals.id'), nullable=False)
 	first_name = db.Column(db.String(100), nullable=False)
-	last_name = db.Column(db.Integer, nullable=False)
+	last_name = db.Column(db.String(100), nullable=False)
 	age = db.Column(db.Integer, nullable=False)
 	genotype = db.Column(db.String(10), nullable=False)
 	blood_group = db.Column(db.String(10), nullable=False)
@@ -18,10 +19,10 @@ class Mother(db.Model):
 	password = db.Column(db.String(150), nullable=False)
 	created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-	# Relationship
+	# RelationshipS
 	# supplments =db.relationship('Supplement', backref='mother', lazy=True)
 	# notifications = db.relationship('Notification', backref='mother', lazy=True)
-	antenatal = db.relationship('Antenatal', backref='mother', lazy=True)
+	antenatal_records = db.relationship('AntenatalRecord', backref='mother', lazy=True)
  
     # Relationship with Hospital
     #hospital = db.relationship('Hospital')  # No backref needed here

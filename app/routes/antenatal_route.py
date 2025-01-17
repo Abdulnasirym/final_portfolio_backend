@@ -8,7 +8,7 @@ from datetime import datetime
 antenatal_bp = Blueprint('antenatal_bp', __name__)
 
 # Create Antenatal Record
-@antenatal_bp.route('/create_antenatal_record', methods=['POST'])
+@antenatal_bp.route('/create_antenatal_record', methods=['GET', 'POST'])
 def create_antenatal_record():
     data = request.get_json()
 

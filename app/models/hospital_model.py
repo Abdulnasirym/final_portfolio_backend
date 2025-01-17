@@ -1,6 +1,6 @@
 from app import db
 import uuid
-from app.models.mother_model import Mother
+#from app.models.mother_model import Mother
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -17,10 +17,8 @@ class Hospital(db.Model):
 
 	# Relationship
 	mothers = db.relationship('Mother', backref='hospital', lazy=True)
-
-	def __repr__(self):
-		return f"<Hospital {self.hospital_name}>"
-
+ 
+ 
 def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 

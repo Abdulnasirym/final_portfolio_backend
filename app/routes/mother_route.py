@@ -9,7 +9,7 @@ from app.models.mother_model import Mother
 mother_bp = Blueprint('mother_bp', __name__)
 
 # Mother Registration
-@mother_bp.route('/register_mother', methods=['POST'])
+@mother_bp.route('/register_mother', methods=['GET', 'POST'])
 def register_mother():
     data = request.get_json()
 
@@ -50,11 +50,11 @@ def register_mother():
     db.session.add(new_mother)
     db.session.commit()
 
-    return jsonify({"message": "Mother registered successfully"}), 201
+    return jsonify({"message": "Mother registered successfully"}), 200
 
 
 # Mother Login
-@mother_bp.route('/login_mother', methods=['POST'])
+@mother_bp.route('/login_mother', methods=['GET', 'POST'])
 def login_mother():
     data = request.get_json()
 
@@ -73,7 +73,8 @@ def login_mother():
 
     # Generate JWT token
     token = create_access_token(identity=mother.id)
-    return jsonify({"token": token}), 200
+    #return jsonify({"token": token}), 200
+    return jsonify({'message': 'logged in successfully'})
 
 
 # Update Mother

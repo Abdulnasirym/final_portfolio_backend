@@ -7,7 +7,7 @@ from flask_jwt_extended import create_access_token
 hospital_bp = Blueprint('hospital_bp', __name__)
 
 # Hospital Registration
-@hospital_bp.route('/register_hospital', methods=['POST'])
+@hospital_bp.route('/register_hospital', methods=['GET', 'POST'])
 def register_hospital():
     data = request.get_json()
 
@@ -41,7 +41,7 @@ def register_hospital():
     return jsonify({"message": "Hospital registered successfully"}), 201
 
 # Hospital Login
-@hospital_bp.route('/login_hospital', methods=['POST'])
+@hospital_bp.route('/login_hospital', methods=['GET','POST'])
 def hospital_login():
     data = request.get_json()
 
@@ -60,4 +60,4 @@ def hospital_login():
 
     # Generate a JWT token
     token = create_access_token(identity=hospital.id)
-    return jsonify({"message": "Login successful", "token": token}), 200
+    return jsonify({"message": "Login successful"}), 200

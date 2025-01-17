@@ -1,7 +1,11 @@
 from app import create_app, db
 from flask_migrate import upgrade
+from flask_jwt_extended import JWTManager
 
 app = create_app()
+
+#initializing jwt
+jwt = JWTManager(app)
 
 # Migrate database schema
 with app.app_context():
