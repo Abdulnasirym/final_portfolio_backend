@@ -5,7 +5,7 @@ from flask import Blueprint, request, jsonify, abort
 supplements = Blueprint('supplements', __name__)
 
 # Adding suplement
-@supplements.route('/supplements', methods=['POST'])
+@supplements.route('/add_supplements', methods=['POST'])
 def add_supplement():
 	data = request.json
 	new_supplement = Supplement(name=data['name'], description=data.get('description'))
@@ -14,7 +14,7 @@ def add_supplement():
 	return jsonify({'messsage': 'Supplement added successfully', 'id': new_supplement.id}), 201
 
 # Getting all supplements
-@supplements.route('/supplements', methods=['GET'])
+@supplements.route('/show_supplements', methods=['GET'])
 def get_supplements():
 	supplements = Supplement.query.all()
 	return jsonify([{'id': s.id, 'name': s.name, 'description':s.description} for s in supplements])
@@ -33,7 +33,7 @@ def get_supplement(supplement_id):
 	})
 
 # Updating supplements
-@supplements.route('/supplements/<int:supplement_id>', methods=['PUT'])
+@supplements.route('/update_supplements/<int:supplement_id>', methods=['PUT'])
 def update_supplement(supplement_id):
 	data = request.json
 	supplement = Supplement.query.get_or_404(supplement_id)
@@ -43,7 +43,7 @@ def update_supplement(supplement_id):
 	return jsonify({'message': 'Supplement updated successfully'})
 
 # Deleting supplements
-@supplements.route('/supplements/<int:supplement_id>', methods=['DELETE'])
+@supplements.route('/delete_supplements/<int:supplement_id>', methods=['DELETE'])
 def delete_supplement(supplement_id):
 	supplement = Supplement.query.get_or_404(supplement_id)
 	db.session.delete(supplement)
