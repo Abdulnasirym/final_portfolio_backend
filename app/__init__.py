@@ -22,22 +22,17 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)
-
-	# Initialize the extensions
-	db.init_app(app)
-	migrate.init_app(app, db)
-	mail.init_app(app)
+    mail.init_app(app)
 
 	# import and register blueprints
-	
-	from .routes.supplements_routes import supplements
-	from .routes.notification_routes import notifications
-	from app.routes.mother_route import mother_bp
-	from app.routes.antenatal_route import antenatal_bp
-	from app.routes.hospital_route import hospital_bp
+    from .routes.supplements_routes import supplements
+    from .routes.notification_routes import notifications
+    from app.routes.mother_route import mother_bp
+    from app.routes.antenatal_route import antenatal_bp
+    from app.routes.hospital_route import hospital_bp
 
-	app.register_blueprint(supplements)
-	app.register_blueprint(notifications)
+    app.register_blueprint(supplements)
+    app.register_blueprint(notifications)
     app.register_blueprint(mother_bp)
     app.register_blueprint(antenatal_bp)
     app.register_blueprint(hospital_bp)

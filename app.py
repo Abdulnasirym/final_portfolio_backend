@@ -1,6 +1,9 @@
+from dotenv import load_dotenv
 from app import create_app, db
 from flask_migrate import upgrade
 from flask_jwt_extended import JWTManager
+
+load_dotenv()
 
 app = create_app()
 
