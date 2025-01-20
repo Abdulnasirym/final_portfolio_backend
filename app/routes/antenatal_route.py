@@ -98,3 +98,20 @@ def delete_antenatal_record(record_id):
     db.session.delete(record)
     db.session.commit()
     return jsonify({"message": "Antenatal record deleted successfully"}), 200
+
+@antenatal_bp.route('/get_all_antenatal_records', methods=['GET'])
+def get_all_antenatal_records():
+    antenatal_records = AntenatalRecord.query.all()
+    records_list = [
+        {
+            "id": record.id,
+            "mother_id": record.mother_id,
+            "weight": record.weight,
+            "blood_pressure": record.blood_pressure,
+            "tests": record.tests,
+            "remark": record.remark,
+            "date_created": record.datecreated
+        }
+        for record in antenatal_records
+    ]
+    return jsonify({"antenatal_records": records_list}), 200

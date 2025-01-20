@@ -117,3 +117,40 @@ def delete_mother(mother_id):
     db.session.delete(mother)
     db.session.commit()
     return jsonify({"message": "Mother deleted successfully"}), 200
+
+#Fetch all registered mothers
+@mother_bp.route('/show_mothers', methods=['GET'])
+def get_mothers():
+    mothers = Mother.query.all()
+    return jsonify(
+        {
+            "id": m.id,
+            "first_name": m.first_name,
+            "last_name": m.last_name,
+            "age": m.age,
+            "email": m.email,
+            "blood_group": m.blood_group,
+            "genotype": m.genotype,
+            "nationality": m.nationality,
+            "hospital_id": m.hospital_id
+        } for m in mothers
+    )
+
+# Fetching a mother by ID
+@mother_bp.route('/mother/<int:mother_id>', methods=['GET'])
+def get_mother(mother_id):
+    mother = Mother.query.get_or_404(mother_id)
+    return jsonify({
+        "id": mother.id,
+        "first_name": mother.first_name,
+        "last_name": mother.last_name,
+        "age": mother.age,
+        "email": mother.email,
+        "blood_group": mother.blood_group,
+        "genotype": mother.genotype,
+        "nationality": mother.nationality,
+        "hospital_id": mother.hospital_id,
+        "created_at": mother.created_at,
+        "updated_at": mother.updated_at
+    })
+ 

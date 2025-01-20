@@ -24,6 +24,7 @@ def create_app():
     from app.routes.mother_route import mother_bp
     from app.routes.antenatal_route import antenatal_bp
     from app.routes.hospital_route import hospital_bp
+    
 
     app.register_blueprint(mother_bp)
     app.register_blueprint(antenatal_bp)
