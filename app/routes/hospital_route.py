@@ -73,6 +73,7 @@ def hospital_login():
     }), 200
     
     
+    
     # Refresh Token Endpoint
 @hospital_bp.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
@@ -92,3 +93,34 @@ def refresh():
 @jwt_required()  # Requires a valid access token
 def protected():
     return jsonify({"message": "This is a protected route"}), 200
+
+# Fetching all hospitals
+@hospital_bp.route('/show_hospitals', methods=['GET'])
+def get_hospitals():
+    hospitals = Hospital.query.all()
+    return jsonify(
+        [
+            {
+                "id": h.id,
+                "hospital_name": h.hospital_name,
+                "hospital_address": h.hospital_address,
+                "phone_number": h.phone_number,
+                "email": h.email,
+                "created_at": h.created_at,
+            } for h in hospitals
+        ]
+    )
+
+# Fetching a hospital by ID
+@hospital_bp.route('/hospital/<int:hospital_id>', methods=['GET'])
+def get_hospital(hospital_id):
+    hospital = Hospital.query.get_or_404(hospital_id)
+    return jsonify({
+        "id": hospital.id,
+        "hospital_name": hospital.hospital_name,
+        "hospital_address": hospital.hospital_address,
+        "phone_number": hospital.phone_number,
+        "email": hospital.email,
+        "created_at": hospital.created_at,
+        "updated_at": hospital.updated_at
+    })

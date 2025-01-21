@@ -4,6 +4,9 @@ from flask_migrate import Migrate
 from flask_mail import Mail
 from config import Config
 from flask_bcrypt import Bcrypt
+from flask_cors import CORS
+from flask_jwt_extended import JWTManager
+
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -14,10 +17,11 @@ bcrypt = Bcrypt()
 def create_app():
     """Factory function to create the Flask app."""
     app = Flask(__name__)
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
     # Load configurations
     app.config.from_object('config.Config')  # Ensure 'Config' class is set up in config.py
-
+    jwt = JWTManager(app)
     # Initialize the extensions
     db.init_app(app)
     migrate.init_app(app, db)
