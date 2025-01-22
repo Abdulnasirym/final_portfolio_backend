@@ -17,7 +17,16 @@ bcrypt = Bcrypt()
 def create_app():
     """Factory function to create the Flask app."""
     app = Flask(__name__)
-    CORS(app, resources={r"/*": {"origins": "*"}})
+    
+    cors = CORS(app, resources={
+        r"/*": {
+            "origins": "http://localhost:4200",  # Frontend URL
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True  # Enable cookies if needed
+        }
+    })
+
 
     # Load configurations
     app.config.from_object('config.Config')  # Ensure 'Config' class is set up in config.py
