@@ -74,8 +74,21 @@ def login_mother():
     # Generate JWT token
     token = create_access_token(identity=mother.id)
     #return jsonify({"token": token}), 200
-    return jsonify({'message': 'logged in successfully'})
-
+    return jsonify({
+    'message': 'logged in successfully',
+    "token": token,
+    "user": {
+        "id": mother.id,
+        "first_name": mother.first_name,
+        "last_name": mother.last_name,
+        "email": mother.email,
+        "age": mother.age,
+        "blood_group": mother.blood_group,
+        "genotype": mother.genotype,
+        "nationality": mother.nationality,
+        "hospital_id": mother.hospital_id
+    }
+}), 200
 
 # Update Mother
 @mother_bp.route('/update_mother/<string:mother_id>', methods=['PUT'])
