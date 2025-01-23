@@ -67,13 +67,17 @@ def hospital_login():
     refresh_token = create_refresh_token(identity=hospital.id)
 
     return jsonify({
-        "message": "Login successful",
-        "access_token": access_token,
-        "refresh_token": refresh_token
-    }), 200
-    
-    
-    
+    'message': 'logged in successfully',
+    "access_token": access_token,
+    "refresh_token": refresh_token,
+    "user": {
+        "id": hospital.id,
+        "hospital_name": hospital.hospital_name,
+        "hospital_address":hospital.hospital_address,
+        "phone_number": hospital.phone_number,
+        "email": hospital.email 
+    }
+}), 200
     # Refresh Token Endpoint
 @hospital_bp.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
