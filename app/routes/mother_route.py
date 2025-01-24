@@ -135,7 +135,7 @@ def delete_mother(mother_id):
 @mother_bp.route('/show_mothers', methods=['GET'])
 def get_mothers():
     mothers = Mother.query.all()
-    return jsonify(
+    return jsonify([
         {
             "id": m.id,
             "first_name": m.first_name,
@@ -147,7 +147,7 @@ def get_mothers():
             "nationality": m.nationality,
             "hospital_id": m.hospital_id
         } for m in mothers
-    )
+    ])
 
 # Fetching a mother by ID
 @mother_bp.route('/mother/<int:mother_id>', methods=['GET'])
