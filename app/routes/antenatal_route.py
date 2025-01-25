@@ -108,9 +108,9 @@ def get_all_antenatal_records():
             "mother_id": record.mother_id,
             "weight": record.weight,
             "blood_pressure": record.blood_pressure,
-            "tests": record.tests,
-            "remark": record.remark,
-            "date_created": record.datecreated
+            "tests": record.tests or "",
+            "remark": record.remark or "",
+            "date_created": record.date_created.strftime('%Y-%m-%d %H:%M:%S') if record.date_created else None
         }
         for record in antenatal_records
     ]

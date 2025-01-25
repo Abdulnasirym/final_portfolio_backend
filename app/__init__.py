@@ -20,13 +20,18 @@ def create_app():
     
     cors = CORS(app, resources={
         r"/*": {
-            "origins": "http://localhost:4200",  # Frontend URL
+            "origins": ["http://localhost:4200", "http://mum-care.vercel.app"],  # Frontend URL
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True  # Enable cookies if needed
         }
     })
 
+
+    # Import models locally to avoid circular imports
+    with app.app_context():
+        from app.models.mother_model import Mother
+        from app.models.children import Children
 
     # Load configurations
     app.config.from_object('config.Config')  # Ensure 'Config' class is set up in config.py
@@ -43,13 +48,16 @@ def create_app():
     from app.routes.mother_route import mother_bp
     from app.routes.antenatal_route import antenatal_bp
     from app.routes.hospital_route import hospital_bp
+    from app.routes.immunization import immunization
+    from app.routes.children import children_bp
     
 
     app.register_blueprint(supplements)
     app.register_blueprint(notifications)
     app.register_blueprint(mother_bp)
     app.register_blueprint(antenatal_bp)
-    app.register_blueprint(hospital_bp)
-    
-   
+    app.register_blueprint(hospital_bp)    
+    app.register_blueprint(immunization)
+    app.register_blueprint(children_bp)
+
     return app

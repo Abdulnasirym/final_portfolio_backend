@@ -1,7 +1,7 @@
 from app import db
 import uuid
 from datetime import datetime
-from app.models.mother_model import Mother
+# from app.models.mother_model import Mother
 
 class AntenatalRecord(db.Model):  # Corrected the name to AntenatalRecord
     __tablename__ = "antenatal_records"
@@ -21,7 +21,7 @@ class AntenatalRecord(db.Model):  # Corrected the name to AntenatalRecord
     )
 
     # Relationship with Mother
-    #mother = db.relationship('Mother', backref='antenatal_records', lazy=True)
+    mother = db.relationship('Mother', backref='antenatal_records', lazy=True)
 
     def __repr__(self):
         return (
