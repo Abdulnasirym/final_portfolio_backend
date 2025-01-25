@@ -150,7 +150,7 @@ def get_mothers():
     ])
 
 # Fetching a mother by ID
-@mother_bp.route('/mother/<int:mother_id>', methods=['GET'])
+@mother_bp.route('/mother/<string:mother_id>', methods=['GET'])
 def get_mother(mother_id):
     mother = Mother.query.get_or_404(mother_id)
     return jsonify({
