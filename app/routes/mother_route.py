@@ -4,8 +4,6 @@ from flask_jwt_extended import create_access_token
 from app import db
 from app.models.mother_model import Mother
 
-
-
 mother_bp = Blueprint('mother_bp', __name__)
 
 # Mother Registration
@@ -79,8 +77,7 @@ def login_mother():
     "token": token,
     "user": {
         "id": mother.id,
-        "first_name": mother.first_name,
-        "last_name": mother.last_name,
+        "full_name": f"{mother.first_name} {mother.last_name}",
         "email": mother.email,
         "age": mother.age,
         "blood_group": mother.blood_group,
@@ -135,11 +132,10 @@ def delete_mother(mother_id):
 @mother_bp.route('/show_mothers', methods=['GET'])
 def get_mothers():
     mothers = Mother.query.all()
-    return jsonify(
+    mothers_list = [
         {
             "id": m.id,
-            "first_name": m.first_name,
-            "last_name": m.last_name,
+            "full_name": f"{m.first_name} {m.last_name}",
             "age": m.age,
             "email": m.email,
             "blood_group": m.blood_group,
@@ -147,7 +143,8 @@ def get_mothers():
             "nationality": m.nationality,
             "hospital_id": m.hospital_id
         } for m in mothers
-    )
+    ]
+    return jsonify(mothers_list)
 
 # Fetching a mother by ID
 @mother_bp.route('/mother/<int:mother_id>', methods=['GET'])
@@ -155,8 +152,7 @@ def get_mother(mother_id):
     mother = Mother.query.get_or_404(mother_id)
     return jsonify({
         "id": mother.id,
-        "first_name": mother.first_name,
-        "last_name": mother.last_name,
+        "full_name": f"{mother.first_name} {mother.last_name}",
         "age": mother.age,
         "email": mother.email,
         "blood_group": mother.blood_group,
@@ -166,4 +162,3 @@ def get_mother(mother_id):
         "created_at": mother.created_at,
         "updated_at": mother.updated_at
     })
- 
