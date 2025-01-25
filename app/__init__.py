@@ -20,7 +20,7 @@ def create_app():
     
     cors = CORS(app, resources={
         r"/*": {
-            "origins": ["http://localhost:4200", "https://mum-care.vercel.app"],  # Frontend URL
+            "origins": ["http://localhost:4200", "http://mum-care.vercel.app"],  # Frontend URL
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True  # Enable cookies if needed
