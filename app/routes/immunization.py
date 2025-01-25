@@ -10,7 +10,7 @@ immunization = Blueprint('immunization', __name__)
 
 from datetime import datetime
 
-@immunization.route('/add', methods=['GET', 'POST'])
+@immunization.route('/add_immunization', methods=['GET', 'POST'])
 def add_immunization():
     if request.method == 'POST':
         # Retrieve form data
@@ -110,7 +110,7 @@ def get_immunization_details(immunization_id):
     }), 200
 
 
-@immunization.route('/update/<string:immunization_id>', methods=['PUT'])
+@immunization.route('/update_immunization/<string:immunization_id>', methods=['PUT'])
 def update_details(immunization_id):
     data = request.json
 

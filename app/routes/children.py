@@ -56,6 +56,31 @@ def add_child():
     return jsonify({'message': 'Invalid request method'}), 405
 
 
+@children_bp.route('/get_children', methods=['GET'])
+def get_children():
+    # Query the database for all children records
+    children = Children.query.all()  # This returns a list of Children objects
+
+    # Prepare the response data
+    result = []
+    for child in children:
+        result.append({
+            "children_id": child.children_id,
+            "first_name": child.first_name,
+            "last_name": child.last_name,
+            "parent_id": child.parent_id,
+            "blood_group": child.blood_group,
+            "genotype": child.genotype,
+            "weight": child.weight,
+            "parent_email": child.parent_email,
+            "age": child.age,
+            "nationality": child.nationality,
+            "date_added": child.date_added.strftime('%Y-%m-%d %H:%M:%S') if child.date_added else None,
+            "date_updated": child.date_updated.strftime('%Y-%m-%d %H:%M:%S') if child.date_updated else None
+        })
+
+    return jsonify(result), 200
+
 
 @children_bp.route('/get_details/<string:children_id>', methods=['GET'])
 

@@ -20,8 +20,12 @@ class Immunization(db.Model):
     next_date = db.Column(db.Date, nullable=False)  
     date_updated = db.Column(db.DateTime, default=datetime.utcnow)
 
-    childrn = db.relationship("Children", backref="immunizations", lazy=True)
-    mother = db.relationship("Mother", backref="immunizations", lazy=True)
+    child = db.relationship(
+        "Children",
+        back_populates="immunizations",
+        lazy=True
+    )
+
 
     def __repr__(self):
         return f"<Children id={self.id}, first_name={self.first_name}, last_name={self.last_name}, parent_email={self.parent_email}>"
