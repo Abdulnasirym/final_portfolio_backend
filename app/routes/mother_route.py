@@ -158,12 +158,12 @@ def get_mother(mother_id):
         "first_name": mother.first_name,
         "last_name": mother.last_name,
         "age": mother.age,
-        "email": mother.email,
+        "email": mother.email or "",
         "blood_group": mother.blood_group,
         "genotype": mother.genotype,
         "nationality": mother.nationality,
         "hospital_id": mother.hospital_id,
-        "created_at": mother.created_at,
-        "updated_at": mother.updated_at
+        "created_at": mother.created_at.strftime('%Y-%m-%d %H:%M:%S') if mother.created_at else None,
+        "updated_at": mother.updated_at.strftime('%Y-%m-%d %H:%M:%S') if mother.updated_at else None,
     })
  

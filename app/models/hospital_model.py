@@ -7,7 +7,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 class Hospital(db.Model):
 	__tablename__ = "hospitals"
 
-	id = db.Column(db.String(10), primary_key=True, default=lambda: str(uuid.uuid4()))
+	id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
 	hospital_name = db.Column(db.String(100), nullable=False)
 	hospital_address = db.Column(db.String(100), nullable=False)
 	phone_number = db.Column(db.Integer, nullable=False)
