@@ -131,23 +131,26 @@ def delete_mother(mother_id):
     db.session.commit()
     return jsonify({"message": "Mother deleted successfully"}), 200
 
-#Fetch all registered mothers
-@mother_bp.route('/show_mothers', methods=['GET', 'POST'])
-def get_mothers():
-    mothers = Mother.query.all()
-    return jsonify([
-        {
-            "id": m.id,
-            "first_name": m.first_name,
-            "last_name": m.last_name,
-            "age": m.age,
-            "email": m.email,
-            "blood_group": m.blood_group,
-            "genotype": m.genotype,
-            "nationality": m.nationality,
-            "hospital_id": m.hospital_id
-        } for m in mothers
-    ])
+@mother_bp.route('/show_mothers', methods=['GET'])
+def get_all_mothers():
+    try:
+        mothers = Mother.query.all()
+        return jsonify([
+            {
+                "id": m.id,
+                "first_name": m.first_name,
+                "last_name": m.last_name,
+                "age": m.age,
+                "email": m.email,
+                "blood_group": m.blood_group,
+                "genotype": m.genotype,
+                "nationality": m.nationality,
+                "hospital_id": m.hospital_id
+            } for m in mothers
+        ]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 # Fetching a mother by ID
 @mother_bp.route('/mother/<string:mother_id>', methods=['GET'])

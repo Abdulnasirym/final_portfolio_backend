@@ -152,7 +152,7 @@ def update_details(immunization_id):
 
 
 
-@immunization.route('/delete_immunization/<string:immunization_id>', methods=['DELETE'])
+@immunization.route('/delete_immunization/<string:immunization_id>', methods=['DELETE', 'GET', 'POST'])
 def delete_immunization(immunization_id):
     immunization = Immunization.query.get(immunization_id)  # Using get() instead of get_or_404()
 
