@@ -132,7 +132,7 @@ def delete_mother(mother_id):
     return jsonify({"message": "Mother deleted successfully"}), 200
 
 #Fetch all registered mothers
-@mother_bp.route('/show_mothers', methods=['GET'])
+@mother_bp.route('/show_mothers', methods=['GET', 'POST'])
 def get_mothers():
     mothers = Mother.query.all()
     return jsonify([

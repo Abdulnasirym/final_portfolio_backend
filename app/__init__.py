@@ -45,7 +45,7 @@ def create_app():
 	# import and register blueprints
     from .routes.supplements_routes import supplements
     from .routes.notification_routes import notifications
-    from .routes.mother_route import mother_bp
+    from app.routes.mother_route import mother_bp
     from app.routes.antenatal_route import antenatal_bp
     from app.routes.hospital_route import hospital_bp
     from app.routes.immunization import immunization

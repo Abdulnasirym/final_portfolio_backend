@@ -7,7 +7,7 @@ from flask import Blueprint, request, jsonify, abort
 supplements = Blueprint('supplements', __name__)
 
 # Adding suplement
-@supplements.route('/add_supplements', methods=['POST'])
+@supplements.route('/add_supplements', methods=['POST', 'GET'])
 def add_supplement():
 	data = request.json
 	new_supplement = Supplement(name=data['name'], description=data.get('description'))
@@ -16,7 +16,7 @@ def add_supplement():
 	return jsonify({'message': 'Supplement added successfully', 'id': str(new_supplement.id)}), 201
 
 # Getting all supplements
-@supplements.route('/show_supplements', methods=['GET'])
+@supplements.route('/show_supplements', methods=['GET', 'POST'])
 def get_supplements():
 	supplements = Supplement.query.all()
 	return jsonify([{'id': str(s.id), 'name': s.name, 'description': s.description} for s in supplements])
