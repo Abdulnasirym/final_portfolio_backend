@@ -11,19 +11,19 @@ class Hospital(db.Model):
 	hospital_name = db.Column(db.String(100), nullable=False)
 	hospital_address = db.Column(db.String(100), nullable=False)
 	phone_number = db.Column(db.Integer, nullable=False)
-	email = db.Column(db.String(20), nullable=False)
-	password = db.Column(db.String(150), nullable=False)
+	email = db.Column(db.String(100), nullable=False)
+	password_hash = db.Column(db.String(150), nullable=False)
 	created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 	# Relationship
-	mothers = db.relationship('Mother', backref='hospital', lazy=True)
+	mothers = db.relationship('Mother', back_populates='hospital', lazy=True)
  
  
-def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+	def set_password(self, password):
+		self.password_hash = generate_password_hash(password)
 
-def check_password(self, password):
-    return check_password_hash(self.password_hash, password)
+	def check_password(self, password):
+		return check_password_hash(self.password_hash, password)
 
-def __repr__(self):
-    return f"<Hospital id={self.id}, name={self.name}, email={self.email}>"
+	def __repr__(self):
+		return f"<Hospital id={self.id}, name={self.hospital_name}, email={self.email}>"
