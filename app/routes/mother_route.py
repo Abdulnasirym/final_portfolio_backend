@@ -44,7 +44,7 @@ def register_mother():
         blood_group=blood_group,
         nationality=nationality,
         email=email,
-        password=password_hash,
+        password_hash=password_hash,
         hospital_id=hospital_id
     )
     db.session.add(new_mother)
@@ -68,7 +68,9 @@ def login_mother():
 
     # Check if the mother exists using email
     mother = Mother.query.filter_by(email=email).first()
-    if not mother or not check_password_hash(mother.password, password):
+    print(mother)
+
+    if not mother or not check_password_hash(mother.password_hash, password):
         return jsonify({"error": "Invalid email or password"}), 400
 
     # Generate JWT token
