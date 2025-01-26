@@ -14,10 +14,10 @@ from datetime import datetime
 def add_immunization():
     if request.method == 'POST':
         # Retrieve form data
+        children_id=request.form.get('children_id')
+        parent_id = request.form.get('parent_id')
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
-        parent_email = request.form.get('parent_email')
-        parent_first_name = request.form.get('parent_first_name')
         age = request.form.get('age')
         previous_date = request.form.get('previous_date')
         next_date = request.form.get('next_date')
@@ -25,7 +25,7 @@ def add_immunization():
         injections = request.form.get('injections')
 
         # Validate required fields
-        if any(not field for field in [first_name, last_name, parent_email, parent_first_name, age, previous_date, next_date, weight, injections]):
+        if any(not field for field in [first_name, last_name, age, previous_date, next_date, weight, injections]):
             flash("Please add the required information.")
             return jsonify({'message': 'Please add the required information'})
 
@@ -39,8 +39,8 @@ def add_immunization():
         # Convert injections to JSON list
         injections_list = [injection.strip() for injection in injections.split(",")]
 
-        parent = Mother.query.filter_by(email=parent_email).first()
-        child = Children.query.filter_by(first_name=first_name, last_name=last_name).first()
+        parent = Mother.query.filter_by(id=parent_id).first()
+        child = Children.query.filter_by(children_id = children_id).first()
 
         if not parent or not child:
             return jsonify({'message': 'Parent or child not found'}), 404
@@ -50,10 +50,10 @@ def add_immunization():
             last_name=last_name,
             parent_id=parent.id,
             children_id=child.children_id,
-            parent_first_name=parent_first_name,
+            parent_first_name=parent.first_name,
+            parent_last_name=parent.last_name,
             injections=json.dumps(injections_list),
             weight=weight,
-            parent_email=parent_email,
             age=age,
             previous_date=previous_date,
             next_date=next_date
@@ -71,19 +71,15 @@ def add_immunization():
 @immunization.route('/get_immunization', methods=['GET'])
 def get_immunizations():
     immunizations = Immunization.query.all()  
-
+    
     result = []  
 
     for immunization in immunizations:  # Iterate over the list
-        result.append({
-            "immunization_id": immunization.immunization_id,  
-            "first_name": immunization.first_name,
-            "last_name": immunization.last_name,
-            "parent_id": immunization.parent_id,
-            "parent_first_name": immunization.parent_first_name,
+        result.append({ 
+            "full_name": f"{immunization.first_name} {immunization.last_name}",  # Combining first and last names
+            "parent_name": f"{immunization.parent_first_name} {immunization.parent_last_name}",
             "injections": json.loads(immunization.injections),  # Convert JSON string back to list
             "weight": immunization.weight,
-            "parent_email": immunization.parent_email,
             "age": immunization.age,
             "previous_date": immunization.previous_date.strftime("%Y-%m-%d"),
             "next_date": immunization.next_date.strftime("%Y-%m-%d")
@@ -95,18 +91,15 @@ def get_immunizations():
 @immunization.route('/get_immunization_details/<string:immunization_id>', methods=['GET'])
 def get_immunization_details(immunization_id):
     immunization = Immunization.query.get_or_404(immunization_id)
+    
     return jsonify({
-        "immunization_id": immunization.immunization_id,
-        "first_name": immunization.first_name,
-        "last_name": immunization.last_name,
-        "parent_id": immunization.parent_id,
-        "parent_first_name": immunization.parent_first_name,
-        "injections": json.loads(immunization.injections),
-        "weight": immunization.weight,
-        "parent_email": immunization.parent_email,
-        "age": immunization.age,
-        "previous_date": immunization.previous_date.strftime("%Y-%m-%d"),
-        "next_date": immunization.next_date.strftime("%Y-%m-%d")
+       "full_name": f"{immunization.first_name} {immunization.last_name}",  
+            "parent_name": f"{immunization.parent_first_name} {immunization.parent_last_name}",
+            "injections": json.loads(immunization.injections),  # Convert JSON string back to list
+            "weight": immunization.weight,
+            "age": immunization.age,
+            "previous_date": immunization.previous_date.strftime("%Y-%m-%d"),
+            "next_date": immunization.next_date.strftime("%Y-%m-%d")
     }), 200
 
 
@@ -122,11 +115,10 @@ def update_details(immunization_id):
     # Update the record fields
     details.first_name = data.get('first_name', details.first_name)
     details.last_name = data.get('last_name', details.last_name)
-    details.parent_id = data.get('parent_id', details.parent_id)
     details.parent_first_name = data.get('parent_first_name', details.parent_first_name)
+    details.parent_last_name = data.get('parent_last_name', details.parent_first_name)
     details.injections = json.dumps(data.get('injections', json.loads(details.injections)))  # Handle JSON conversion
     details.weight = data.get('weight', details.weight)
-    details.parent_email = data.get('parent_email', details.parent_email)
     details.age = data.get('age', details.age)
 
     # Convert and validate dates

@@ -27,7 +27,6 @@ def create_app():
         }
     })
 
-
     # Import models locally to avoid circular imports
     with app.app_context():
         from app.models.mother_model import Mother

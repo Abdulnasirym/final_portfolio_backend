@@ -1,8 +1,8 @@
-"""create database
+"""Initial migrations
 
-Revision ID: 2d4f266c045c
+Revision ID: fbafd5e78299
 Revises: 
-Create Date: 2025-01-25 14:23:04.861520
+Create Date: 2025-01-26 19:39:38.498338
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2d4f266c045c'
+revision = 'fbafd5e78299'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -60,10 +60,9 @@ def upgrade():
     sa.Column('first_name', sa.String(length=200), nullable=False),
     sa.Column('last_name', sa.String(length=200), nullable=False),
     sa.Column('parent_id', sa.String(), nullable=True),
-    sa.Column('blood_group', sa.String(length=20), nullable=False),
-    sa.Column('genotype', sa.String(length=20), nullable=False),
+    sa.Column('parent_first_name', sa.String(length=200), nullable=False),
+    sa.Column('parent_last_name', sa.String(length=200), nullable=False),
     sa.Column('weight', sa.Float(), nullable=False),
-    sa.Column('parent_email', sa.String(length=200), nullable=False),
     sa.Column('nationality', sa.String(length=200), nullable=False),
     sa.Column('age', sa.Integer(), nullable=False),
     sa.Column('date_added', sa.DateTime(), nullable=True),
@@ -98,8 +97,8 @@ def upgrade():
     sa.Column('last_name', sa.String(length=200), nullable=False),
     sa.Column('parent_id', sa.String(), nullable=True),
     sa.Column('parent_first_name', sa.String(length=200), nullable=False),
+    sa.Column('parent_last_name', sa.String(length=200), nullable=False),
     sa.Column('weight', sa.Float(), nullable=False),
-    sa.Column('parent_email', sa.String(length=200), nullable=True),
     sa.Column('age', sa.Integer(), nullable=False),
     sa.Column('injections', sa.Text(), nullable=True),
     sa.Column('previous_date', sa.Date(), nullable=False),
