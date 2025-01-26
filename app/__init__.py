@@ -18,15 +18,8 @@ def create_app():
     """Factory function to create the Flask app."""
     app = Flask(__name__)
     
-    cors = CORS(app, resources={
-        r"/*": {
-            "origins": ["http://localhost:4200", "http://mum-care.vercel.app"],  # Frontend URL
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": True  # Enable cookies if needed
-        }
-    })
-
+    # Modified CORS configuration to allow all origins for all routes
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
     # Import models locally to avoid circular imports
     with app.app_context():
