@@ -43,7 +43,7 @@ def create_antenatal_record():
     return jsonify({"message": "Antenatal record created successfully", "record": antenatal_record.id}), 201
 
 # Retrieve Antenatal Records by Mother ID
-@antenatal_bp.route('/get_antenatal_records/<string:mother_id>', methods=['GET'])
+@antenatal_bp.route('/get_antenatal_record/<string:mother_id>', methods=['GET'])
 def get_antenatal_records(mother_id):
     # Check if the mother exists
     mother = Mother.query.get(mother_id)
@@ -52,6 +52,9 @@ def get_antenatal_records(mother_id):
 
     # Fetch antenatal records for the mother
     records = AntenatalRecord.query.filter_by(mother_id=mother_id).all()
+
+    mother_full_name = f"{mother.first_name} {mother.last_name}"
+
     records_list = [
         {
             "id": record.id,
@@ -64,7 +67,10 @@ def get_antenatal_records(mother_id):
         for record in records
     ]
 
-    return jsonify({"records": records_list}), 200
+    return jsonify({
+        "mother_name": mother_full_name,
+        "antenatal_records": records_list
+    }), 200
 
 # Update Antenatal Record
 @antenatal_bp.route('/update_antenatal_record/<string:record_id>', methods=['PUT'])

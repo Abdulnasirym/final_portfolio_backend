@@ -9,11 +9,10 @@ children_bp = Blueprint('children', __name__)
 
 
 # Defining  route
-@children_bp.route('/add_child', methods=['GET', 'POST'])
+@children_bp.route('/add_child', methods=['POST'])
 def add_child():
     if request.method == 'POST':
         # Retrieve form data
-        parent_id = request.form.get('parent_id')
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
         weight = request.form.get('weight')
@@ -21,12 +20,12 @@ def add_child():
         age = request.form.get('age')
 
         # Check for missing fields
-        if any(not field for field in [parent_id, first_name, last_name,  weight, nationality, age]):
+        if any(not field for field in [first_name, last_name,  weight, nationality, age]):
             flash("All fields are required")
             return jsonify({'message': 'All fields are required'}), 400
 
         # Find mother using parent_email
-        mother = Mother.query.filter_by(id=parent_id).first()
+        mother = Mother.query.filter_by(id=mother_id).first()
         if not mother:
             flash("Mother not found")
             return jsonify({'message': 'Mother not found'}), 404
@@ -56,12 +55,16 @@ def add_child():
 @children_bp.route('/get_children', methods=['GET'])
 def get_children():
     # Query the database for all children records
-    children = Children.query.all()  
+    children = Children.query.all()
+
+    if not children:
+        return jsonify({"message": "No children found for this mother"}), 404  
    
     # Prepare the response data
     result = []
     for child in children:
         result.append({
+            "id": child.children_id,
             "full_name": f"{child.first_name} {child.last_name}",
             "parent_name": f"{child.parent_first_name} {child.parent_last_name}",
             "weight": child.weight,

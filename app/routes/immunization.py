@@ -5,16 +5,12 @@ from app.models.immunization import Immunization
 from app import db 
 from datetime import datetime
 
-
 immunization = Blueprint('immunization', __name__)
-
-from datetime import datetime
 
 @immunization.route('/add_immunization', methods=['GET', 'POST'])
 def add_immunization():
     if request.method == 'POST':
         # Retrieve form data
-        children_id=request.form.get('children_id')
         parent_id = request.form.get('parent_id')
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
@@ -66,10 +62,8 @@ def add_immunization():
         flash("Immunization schedule added.")
         return jsonify({"message": "Immunization Schedule added"})
 
-
-
 @immunization.route('/get_immunization', methods=['GET'])
-def get_immunizations():
+def get_immunizations(children_id):
     immunizations = Immunization.query.all()  
     
     result = []  
@@ -87,7 +81,6 @@ def get_immunizations():
 
     return jsonify(result), 200
 
-
 @immunization.route('/get_immunization_details/<string:immunization_id>', methods=['GET'])
 def get_immunization_details(immunization_id):
     immunization = Immunization.query.get_or_404(immunization_id)
@@ -101,7 +94,6 @@ def get_immunization_details(immunization_id):
             "previous_date": immunization.previous_date.strftime("%Y-%m-%d"),
             "next_date": immunization.next_date.strftime("%Y-%m-%d")
     }), 200
-
 
 @immunization.route('/update_immunization/<string:immunization_id>', methods=['PUT'])
 def update_details(immunization_id):
@@ -139,10 +131,6 @@ def update_details(immunization_id):
 
     # Return a success response
     return jsonify({"message": "Data successfully updated"}), 200
-
-
-
-
 
 @immunization.route('/delete_immunization/<string:immunization_id>', methods=['DELETE', 'GET', 'POST'])
 def delete_immunization(immunization_id):
