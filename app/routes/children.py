@@ -75,7 +75,6 @@ def get_children():
 
 
 @children_bp.route('/get_details/<string:children_id>', methods=['GET'])
-
 def get_details(children_id):
 
      # Query the database for the child record
@@ -84,7 +83,7 @@ def get_details(children_id):
     #Display the details
     return jsonify({
        "full_name": f"{children.first_name} {children.last_name}",
-            "parent_name": f"{children.first_name} {children.last_name}",
+            "parent_name": f"{children.parent_first_name} {children.parent_last_name}",
             "weight": children.weight,
             "age": children.age,
             "nationality": children.nationality,
