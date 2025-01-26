@@ -1,5 +1,8 @@
 virt/
+config.py
+venv
 project/
 sql.py
 sql2.py
 sql3.py
+sql4.py

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, flash, abort
 from app.models.children import Children  
-from app.models.mothers import Mother
+from app.models.mother_model import Mother
 from app import db 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -13,35 +13,32 @@ children_bp = Blueprint('children', __name__)
 def add_child():
     if request.method == 'POST':
         # Retrieve form data
+        parent_id = request.form.get('parent_id')
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
-        blood_group = request.form.get('blood_group')
-        genotype = request.form.get('genotype')
         weight = request.form.get('weight')
-        parent_email = request.form.get('parent_email')
         nationality = request.form.get('nationality')
         age = request.form.get('age')
 
         # Check for missing fields
-        if any(not field for field in [first_name, last_name, blood_group, genotype, weight, nationality, age, parent_email]):
+        if any(not field for field in [parent_id, first_name, last_name,  weight, nationality, age]):
             flash("All fields are required")
             return jsonify({'message': 'All fields are required'}), 400
 
         # Find mother using parent_email
-        mother = Mother.query.filter_by(email=parent_email).first()
+        mother = Mother.query.filter_by(id=parent_id).first()
         if not mother:
             flash("Mother not found")
             return jsonify({'message': 'Mother not found'}), 404
 
         # Create new child record
         new_child = Children(
+            parent_id=parent_id,
+            parent_first_name=mother.first_name,
+            parent_last_name= mother.last_name,
             first_name=first_name,
             last_name=last_name,
-            parent_id=mother.id,  # Reference the mother's ID
-            blood_group=blood_group,
-            genotype=genotype,
             weight=weight,
-            parent_email=parent_email,
             nationality=nationality,
             age=age
         )
@@ -59,20 +56,15 @@ def add_child():
 @children_bp.route('/get_children', methods=['GET'])
 def get_children():
     # Query the database for all children records
-    children = Children.query.all()  # This returns a list of Children objects
-
+    children = Children.query.all()  
+   
     # Prepare the response data
     result = []
     for child in children:
         result.append({
-            "children_id": child.children_id,
-            "first_name": child.first_name,
-            "last_name": child.last_name,
-            "parent_id": child.parent_id,
-            "blood_group": child.blood_group,
-            "genotype": child.genotype,
+            "full_name": f"{child.first_name} {child.last_name}",
+            "parent_name": f"{child.parent_first_name} {child.parent_last_name}",
             "weight": child.weight,
-            "parent_email": child.parent_email,
             "age": child.age,
             "nationality": child.nationality,
             "date_added": child.date_added.strftime('%Y-%m-%d %H:%M:%S') if child.date_added else None,
@@ -88,21 +80,16 @@ def get_details(children_id):
 
      # Query the database for the child record
     children = Children.query.get_or_404 (children_id)
-    
+   
     #Display the details
     return jsonify({
-       "id":            children.children_id,
-       "first_name":    children.first_name,
-       "last_name":     children.last_name,
-       "parent_id":     children.parent_id,
-       "blood_group":   children.blood_group,
-       "genotype":      children.genotype,
-       "weight":        children.weight,
-       "parent_email":  children.parent_email,
-       "age":           children.age,
-       "nationality":   children.nationality,
-       "date_added":    children.date_added,
-       "date_updated":  children.date_updated
+       "full_name": f"{children.first_name} {children.last_name}",
+            "parent_name": f"{children.first_name} {children.last_name}",
+            "weight": children.weight,
+            "age": children.age,
+            "nationality": children.nationality,
+            "date_added": children.date_added.strftime('%Y-%m-%d %H:%M:%S') if children.date_added else None,
+            "date_updated": children.date_updated.strftime('%Y-%m-%d %H:%M:%S') if children.date_updated else None
 
     })
 
@@ -121,9 +108,6 @@ def update_details(children_id):
     # Update child details
     children.first_name = data.get('first_name', children.first_name)
     children.last_name = data.get('last_name', children.last_name)
-    children.parent_email = data.get('parent_email', children.parent_email)
-    children.blood_group = data.get('blood_group', children.blood_group)
-    children.genotype = data.get('genotype', children.genotype)
     children.weight = data.get('weight', children.weight)
     children.nationality = data.get('nationality', children.nationality)
     children.age = data.get('age', children.age)
