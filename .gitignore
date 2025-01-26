@@ -5,3 +5,4 @@ project/
 sql.py
 sql2.py
 sql3.py
+__pycache__/
