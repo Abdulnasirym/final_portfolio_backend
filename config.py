@@ -13,5 +13,3 @@ class Config:
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)  # Refresh token expires in 30 days
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    
-   

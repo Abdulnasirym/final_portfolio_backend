@@ -4,8 +4,6 @@ from flask_jwt_extended import create_access_token
 from app import db
 from app.models.mother_model import Mother
 
-
-
 mother_bp = Blueprint('mother_bp', __name__)
 
 # Mother Registration
@@ -44,7 +42,7 @@ def register_mother():
         blood_group=blood_group,
         nationality=nationality,
         email=email,
-        password=password_hash,
+        password_hash=password_hash,
         hospital_id=hospital_id
     )
     db.session.add(new_mother)
@@ -68,7 +66,9 @@ def login_mother():
 
     # Check if the mother exists using email
     mother = Mother.query.filter_by(email=email).first()
-    if not mother or not check_password_hash(mother.password, password):
+    print(mother)
+
+    if not mother or not check_password_hash(mother.password_hash, password):
         return jsonify({"error": "Invalid email or password"}), 400
 
     # Generate JWT token
@@ -79,8 +79,7 @@ def login_mother():
     "token": token,
     "user": {
         "id": mother.id,
-        "first_name": mother.first_name,
-        "last_name": mother.last_name,
+        "full_name": f"{mother.first_name} {mother.last_name}",
         "email": mother.email,
         "age": mother.age,
         "blood_group": mother.blood_group,
@@ -131,11 +130,10 @@ def delete_mother(mother_id):
     db.session.commit()
     return jsonify({"message": "Mother deleted successfully"}), 200
 
-#Fetch all registered mothers
 @mother_bp.route('/show_mothers', methods=['GET'])
 def get_mothers():
     mothers = Mother.query.all()
-    return jsonify([
+    return jsonify(
         {
             "id": m.id,
             "first_name": m.first_name,
@@ -147,7 +145,7 @@ def get_mothers():
             "nationality": m.nationality,
             "hospital_id": m.hospital_id
         } for m in mothers
-    ])
+    )
 
 # Fetching a mother by ID
 @mother_bp.route('/mother/<string:mother_id>', methods=['GET'])
@@ -155,15 +153,13 @@ def get_mother(mother_id):
     mother = Mother.query.get_or_404(mother_id)
     return jsonify({
         "id": mother.id,
-        "first_name": mother.first_name,
-        "last_name": mother.last_name,
+        "full_name": f"{mother.first_name} {mother.last_name}",
         "age": mother.age,
-        "email": mother.email,
+        "email": mother.email or "",
         "blood_group": mother.blood_group,
         "genotype": mother.genotype,
         "nationality": mother.nationality,
         "hospital_id": mother.hospital_id,
-        "created_at": mother.created_at,
-        "updated_at": mother.updated_at
+        "created_at": mother.created_at.strftime('%Y-%m-%d %H:%M:%S') if mother.created_at else None,
+        "updated_at": mother.updated_at.strftime('%Y-%m-%d %H:%M:%S') if mother.updated_at else None,
     })
- 
