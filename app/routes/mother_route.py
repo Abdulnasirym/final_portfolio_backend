@@ -68,7 +68,7 @@ def login_mother():
     mother = Mother.query.filter_by(email=email).first()
     print(mother)
 
-    if not mother or not check_password_hash(mother.password_hash, password):
+    if not mother or not mother.check_password(password):
         return jsonify({"error": "Invalid email or password"}), 400
 
     # Generate JWT token
@@ -79,7 +79,8 @@ def login_mother():
     "token": token,
     "user": {
         "id": mother.id,
-        "full_name": f"{mother.first_name} {mother.last_name}",
+        "first_name": mother.first_name,
+        "last_name": mother.last_name,
         "email": mother.email,
         "age": mother.age,
         "blood_group": mother.blood_group,
@@ -131,21 +132,24 @@ def delete_mother(mother_id):
     return jsonify({"message": "Mother deleted successfully"}), 200
 
 @mother_bp.route('/show_mothers', methods=['GET'])
-def get_mothers():
-    mothers = Mother.query.all()
-    return jsonify(
-        {
-            "id": m.id,
-            "first_name": m.first_name,
-            "last_name": m.last_name,
-            "age": m.age,
-            "email": m.email,
-            "blood_group": m.blood_group,
-            "genotype": m.genotype,
-            "nationality": m.nationality,
-            "hospital_id": m.hospital_id
-        } for m in mothers
-    )
+def get_all_mothers():
+    try:
+        mothers = Mother.query.all()
+        return jsonify([
+            {
+                "id": m.id,
+                "first_name": m.first_name,
+                "last_name": m.last_name,
+                "age": m.age,
+                "email": m.email,
+                "blood_group": m.blood_group,
+                "genotype": m.genotype,
+                "nationality": m.nationality,
+                "hospital_id": m.hospital_id
+            } for m in mothers
+        ]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Fetching a mother by ID
 @mother_bp.route('/mother/<string:mother_id>', methods=['GET'])
@@ -153,7 +157,8 @@ def get_mother(mother_id):
     mother = Mother.query.get_or_404(mother_id)
     return jsonify({
         "id": mother.id,
-        "full_name": f"{mother.first_name} {mother.last_name}",
+        "first_name": mother.first_name,
+        "last_name": mother.last_name,
         "age": mother.age,
         "email": mother.email or "",
         "blood_group": mother.blood_group,
@@ -163,3 +168,4 @@ def get_mother(mother_id):
         "created_at": mother.created_at.strftime('%Y-%m-%d %H:%M:%S') if mother.created_at else None,
         "updated_at": mother.updated_at.strftime('%Y-%m-%d %H:%M:%S') if mother.updated_at else None,
     })
+ 

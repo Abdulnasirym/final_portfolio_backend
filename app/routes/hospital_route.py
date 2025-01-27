@@ -32,12 +32,13 @@ def register_hospital():
 
     # Hash the password and save hospital information to the database
     password_hash = generate_password_hash(password)
+
     new_hospital = Hospital(
         hospital_name=name,
         hospital_address=address,
         phone_number=phone_number,
         email=email,
-        password=password_hash
+        password_hash=password_hash
     )
     db.session.add(new_hospital)
     db.session.commit()
@@ -45,13 +46,13 @@ def register_hospital():
     return jsonify({"message": "Hospital registered successfully"}), 201
 
 # Hospital Login
-@hospital_bp.route('/login_hospital', methods=['GET','POST'])
+@hospital_bp.route("/login_hospital", methods=["GET", "POST"])
 def hospital_login():
     data = request.get_json()
 
     # Extract data from request
-    email = data.get('email')
-    password = data.get('password')
+    email = data.get("email")
+    password = data.get("password")
 
     # Validate required fields
     if not all([email, password]):
@@ -59,26 +60,32 @@ def hospital_login():
 
     # Check if the email exists and verify password
     hospital = Hospital.query.filter_by(email=email).first()
-    if not hospital or not check_password_hash(hospital.password, password):
+    if not hospital or not hospital.check_password(password):  # Use the check_password method
         return jsonify({"error": "Invalid email or password"}), 400
 
     # Generate a JWT token
     access_token = create_access_token(identity=hospital.id)
     refresh_token = create_refresh_token(identity=hospital.id)
 
-    return jsonify({
-    'message': 'logged in successfully',
-    "access_token": access_token,
-    "refresh_token": refresh_token,
-    "user": {
-        "id": hospital.id,
-        "hospital_name": hospital.hospital_name,
-        "hospital_address":hospital.hospital_address,
-        "phone_number": hospital.phone_number,
-        "email": hospital.email 
-    }
-}), 200
-    # Refresh Token Endpoint
+    return (
+        jsonify(
+            {
+                "message": "logged in successfully",
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "user": {
+                    "id": hospital.id,
+                    "hospital_name": hospital.hospital_name,
+                    "hospital_address": hospital.hospital_address,
+                    "phone_number": hospital.phone_number,
+                    "email": hospital.email,
+                },
+            }
+        ),
+        200,
+    )
+
+# Refresh Token Endpoint
 @hospital_bp.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
 def refresh():
