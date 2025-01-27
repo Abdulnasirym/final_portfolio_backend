@@ -53,8 +53,6 @@ def get_antenatal_records(mother_id):
     # Fetch antenatal records for the mother
     records = AntenatalRecord.query.filter_by(mother_id=mother_id).all()
 
-    mother_full_name = f"{mother.first_name} {mother.last_name}"
-
     records_list = [
         {
             "id": record.id,
@@ -67,10 +65,7 @@ def get_antenatal_records(mother_id):
         for record in records
     ]
 
-    return jsonify({
-        "mother_name": mother_full_name,
-        "antenatal_records": records_list
-    }), 200
+    return jsonify({"records": records_list}), 200
 
 # Update Antenatal Record
 @antenatal_bp.route('/update_antenatal_record/<string:record_id>', methods=['PUT'])
@@ -108,16 +103,23 @@ def delete_antenatal_record(record_id):
 @antenatal_bp.route('/get_all_antenatal_records', methods=['GET'])
 def get_all_antenatal_records():
     antenatal_records = AntenatalRecord.query.all()
-    records_list = [
-        {
+
+    records_list = []
+    for record in antenatal_records:
+        # Fetch mother information for each record
+        mother = Mother.query.get(record.mother_id)
+        mother_full_name = f"{mother.first_name} {mother.last_name}" if mother else "Unknown Mother"
+
+        records_list.append({
             "id": record.id,
-            "mother_id": record.mother_id,
+            "mother_name": mother_full_name,
             "weight": record.weight,
             "blood_pressure": record.blood_pressure,
             "tests": record.tests or "",
             "remark": record.remark or "",
             "date_created": record.date_created.strftime('%Y-%m-%d %H:%M:%S') if record.date_created else None
-        }
-        for record in antenatal_records
-    ]
-    return jsonify({"antenatal_records": records_list}), 200
+        })
+
+    return jsonify({
+        "antenatal_records": records_list
+    }), 200

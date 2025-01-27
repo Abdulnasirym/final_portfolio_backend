@@ -128,15 +128,10 @@ def delete_child(children_id):
     # Fetch the child record
     children = Children.query.get_or_404(children_id)
 
-    if not children:
-        flash("Child does not exist")
-        return jsonify({"message": "Child does not exist"}), 404
-
     # Delete the child record
     db.session.delete(children)
     db.session.commit()
 
-    flash("Child's information deleted")
     return jsonify({"message": "Child's information deleted"}), 200
 
   
